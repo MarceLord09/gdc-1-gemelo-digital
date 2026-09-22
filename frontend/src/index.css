@@ -1,0 +1,189 @@
+/* ---------------------------------------------------------------------
+   GDC-1 — sistema de diseño corporativo
+   Fondo blanco, azul corporativo como color de marca (navegación activa,
+   botones primarios, foco), gris neutro para texto y reglas. Los colores
+   de datos vienen de una paleta validada por contraste y daltonismo
+   (ver dataviz skill) y se mantienen separados de la marca.
+   --------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+
+  --paper: #ffffff;
+  --paper-raised: #ffffff;
+  --paper-sunken: #f1f5f9;
+
+  --ink: #111827;
+  --ink-secondary: #4b5563;
+  --ink-muted: #6b7280;
+
+  --rule: #e5e7eb;
+  --rule-strong: #cbd5e1;
+
+  --brand-primary: #1e40af;
+  --brand-accent: #2563eb;
+  --brand-accent-ink: #ffffff;
+
+  --error: #b91c1c;
+
+  --good: #0f7a4f;
+  --good-surface: #dcefe2;
+
+  --focus-ring: #2563eb;
+
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+
+  --font-display: "Spectral", "Iowan Old Style", Georgia, serif;
+  --font-ui: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  /* Colores de datos — identidad fija por categoría, un solo trabajo cada uno. */
+  --series-paid-work: #2a78d6; /* trabajo remunerado */
+  --series-unpaid-care: #eb6834; /* trabajo no remunerado / cuidado */
+  --series-leisure: #1baf7a; /* ocio */
+  --series-sleep: #94a3b8; /* sueño + cuidado personal (fijo) */
+  --series-female: #4a3aa7;
+  --series-male: #eda100;
+  --series-neutral: #2a78d6; /* barra de una sola serie (comparaciones por escenario/modelo) */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --paper: #0b1220;
+    --paper-raised: #111a2c;
+    --paper-sunken: #16223a;
+
+    --ink: #f3f4f6;
+    --ink-secondary: #b6bfcc;
+    --ink-muted: #8792a3;
+
+    --rule: #23304a;
+    --rule-strong: #2e3d5c;
+
+    --brand-primary: #3b82f6;
+    --brand-accent: #60a5fa;
+    --brand-accent-ink: #0b1220;
+
+    --error: #f87171;
+
+    --good: #4fd399;
+    --good-surface: #163024;
+
+    --focus-ring: #60a5fa;
+
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.35);
+
+    --series-paid-work: #3987e5;
+    --series-unpaid-care: #d95926;
+    --series-leisure: #199e70;
+    --series-sleep: #64748b;
+    --series-female: #9085e9;
+    --series-male: #c98500;
+    --series-neutral: #3987e5;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #0b1220;
+  --paper-raised: #111a2c;
+  --paper-sunken: #16223a;
+
+  --ink: #f3f4f6;
+  --ink-secondary: #b6bfcc;
+  --ink-muted: #8792a3;
+
+  --rule: #23304a;
+  --rule-strong: #2e3d5c;
+
+  --brand-primary: #3b82f6;
+  --brand-accent: #60a5fa;
+  --brand-accent-ink: #0b1220;
+
+  --error: #f87171;
+
+  --good: #4fd399;
+  --good-surface: #163024;
+
+  --focus-ring: #60a5fa;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.35);
+
+  --series-paid-work: #3987e5;
+  --series-unpaid-care: #d95926;
+  --series-leisure: #199e70;
+  --series-sleep: #64748b;
+  --series-female: #9085e9;
+  --series-male: #c98500;
+  --series-neutral: #3987e5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0;
+}
+
+button, input, select {
+  font-family: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

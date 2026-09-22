@@ -1,0 +1,8 @@
+escenario,participacion_laboral_femenina,brecha_genero_horas_no_remuneradas,horas_no_remuneradas_mujeres,horas_no_remuneradas_hombres,tasa_pobreza_tiempo,costo_fiscal_semanal_percapita_usd
+Base,0.802,4.85,18.06,13.22,0.002,0.0
+A_guarderias_universales,0.803,3.64,13.13,9.49,0.0,42.0
+B_licencia_igualitaria,0.802,4.78,18.09,13.31,0.001,28.0
+C_bono_cuidador,0.801,4.84,16.94,12.1,0.001,35.0
+D_reduccion_jornada,0.85,4.78,17.95,13.17,0.001,15.0
+E_infraestructura_cuidados,0.803,4.46,16.14,11.68,0.0,30.0
+F_intervencion_integral,0.89,3.25,11.69,8.45,0.0,150.0

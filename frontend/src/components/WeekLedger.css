@@ -1,0 +1,75 @@
+.week-ledger {
+  position: relative;
+}
+
+.week-ledger-bar {
+  display: flex;
+  gap: 2px;
+  height: 44px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.week-ledger-segment {
+  min-width: 3px;
+  transition: flex-grow 0.25s ease;
+}
+
+.week-ledger-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+.week-ledger-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px 16px;
+  margin-top: 18px;
+}
+
+.week-ledger-legend-item {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  border-top: 1px solid var(--rule);
+  padding-top: 8px;
+}
+
+.week-ledger-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: none;
+  transform: translateY(-1px);
+}
+
+.week-ledger-legend-label {
+  font-size: 13.5px;
+  color: var(--ink-secondary);
+  flex: 1;
+}
+
+.week-ledger-legend-value {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.week-ledger-tooltip {
+  position: absolute;
+  top: -8px;
+  transform: translate(-50%, -100%);
+  background: var(--ink);
+  color: var(--paper-raised);
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-size: 12.5px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 5;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+}

@@ -1,0 +1,92 @@
+{
+  "model_performance": {
+    "RandomForest": {
+      "rmse_mean": 2.7696863513541983,
+      "rmse_std": 0.3493079440197398,
+      "r2_mean": 0.9339314567896395,
+      "r2_std": 0.018879187502647683
+    },
+    "XGBoost": {
+      "rmse_mean": 2.0329348285352618,
+      "rmse_std": 0.2247083067260592,
+      "r2_mean": 0.9651870571847617,
+      "r2_std": 0.005385191311561441
+    },
+    "SVR": {
+      "rmse_mean": 2.1467889745466806,
+      "rmse_std": 0.2293851728698937,
+      "r2_mean": 0.9613905730694838,
+      "r2_std": 0.0042237178946284756
+    },
+    "Stacking": {
+      "rmse_mean": 1.9454594965756027,
+      "rmse_std": 0.22616887736598415,
+      "r2_mean": 0.9681559131715277,
+      "r2_std": 0.005038756508233091
+    },
+    "Blending": {
+      "rmse_mean": 1.9974878982180921,
+      "rmse_std": 0.23203670613649613,
+      "r2_mean": 0.9665993301324175,
+      "r2_std": 0.0036823757211173996
+    }
+  },
+  "winner": "Stacking",
+  "friedman": {
+    "statistic": 33.52000000000001,
+    "p_value": 9.346896737923136e-07
+  },
+  "wilcoxon_vs_winner": {
+    "RandomForest": {
+      "statistic": 0.0,
+      "p_value": 0.001953125
+    },
+    "XGBoost": {
+      "statistic": 0.0,
+      "p_value": 0.001953125
+    },
+    "SVR": {
+      "statistic": 0.0,
+      "p_value": 0.001953125
+    },
+    "Blending": {
+      "statistic": 15.0,
+      "p_value": 0.232421875
+    }
+  },
+  "nadeau_bengio_vs_winner": {
+    "RandomForest": {
+      "t_statistic": 4.942264000200173,
+      "p_value": 0.0007997487999160668
+    },
+    "XGBoost": {
+      "t_statistic": 3.557446399792365,
+      "p_value": 0.006143800594808235
+    },
+    "SVR": {
+      "t_statistic": 4.526870191895007,
+      "p_value": 0.0014326095387378057
+    },
+    "Blending": {
+      "t_statistic": 0.8202282584481204,
+      "p_value": 0.4332717021113912
+    }
+  },
+  "bootstrap_ci_rmse_winner": {
+    "lower": 1.8095692452484706,
+    "upper": 2.4994341958050295
+  },
+  "shapiro_wilk_residuals": {
+    "statistic": 0.8243001055179082,
+    "p_value": 5.304930238881271e-23
+  },
+  "breusch_pagan_residuals": {
+    "statistic": 98.41177628952158,
+    "p_value": 3.3983229985855125e-23
+  },
+  "blending_weights": [
+    0.0,
+    0.7000000000000001,
+    0.29999999999999993
+  ]
+}
