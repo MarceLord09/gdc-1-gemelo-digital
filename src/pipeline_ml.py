@@ -5,16 +5,17 @@ import json
 
 import numpy as np
 import pandas as pd
+import shap
 from scipy import stats
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestRegressor, StackingRegressor
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import (
-    KFold,
     RandomizedSearchCV,
+    StratifiedKFold,
     train_test_split,
 )
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.svm import SVR
@@ -82,10 +83,15 @@ class BlendingEnsemble:
         return preds @ self.weights_
 
 
-def _cv_scores(model_fn, X: pd.DataFrame, y: pd.Series, k=10):
-    kf = KFold(n_splits=k, shuffle=True, random_state=RANDOM_STATE)
-    rmses, r2s = [], []
-    for train_idx, test_idx in kf.split(X):
+def make_strata(y: pd.Series, q: int = 4) -> np.ndarray:
+    """Bins continuos de la variable objetivo para estratificar el k-fold de regresion."""
+    return pd.qcut(y, q=q, labels=False, duplicates="drop").to_numpy()
+
+
+def _cv_scores(model_fn, X: pd.DataFrame, y: pd.Series, y_strata: np.ndarray, k=10):
+    skf = StratifiedKFold(n_splits=k, shuffle=True, random_state=RANDOM_STATE)
+    rmses, r2s, maes = [], [], []
+    for train_idx, test_idx in skf.split(X, y_strata):
         X_tr, X_te = X.iloc[train_idx], X.iloc[test_idx]
         y_tr, y_te = y.iloc[train_idx], y.iloc[test_idx]
         model = model_fn()
@@ -93,7 +99,8 @@ def _cv_scores(model_fn, X: pd.DataFrame, y: pd.Series, k=10):
         pred = model.predict(X_te)
         rmses.append(mean_squared_error(y_te, pred) ** 0.5)
         r2s.append(r2_score(y_te, pred))
-    return np.array(rmses), np.array(r2s)
+        maes.append(mean_absolute_error(y_te, pred))
+    return np.array(rmses), np.array(r2s), np.array(maes)
 
 
 def nadeau_bengio_test(diffs: np.ndarray, n_train: int, n_test: int) -> tuple[float, float]:
@@ -194,6 +201,8 @@ def run_pipeline(df: pd.DataFrame, output_dir: str) -> dict:
     blend = BlendingEnsemble({"rf": rf_best, "xgb": xgb_best, "svr": svr_best})
     blend.fit(X_train_fit, y_train_fit, X_val, y_val)
 
+    y_strata = make_strata(y, q=4)
+
     results = {}
     cv_rmse_matrix = {}
 
@@ -203,19 +212,22 @@ def run_pipeline(df: pd.DataFrame, output_dir: str) -> dict:
         ("SVR", svr_best),
         ("Stacking", stacking),
     ]:
-        rmses, r2s = _cv_scores(lambda m=fitted_model: _clone_fitted(m), X, y, k=10)
+        rmses, r2s, maes = _cv_scores(lambda m=fitted_model: _clone_fitted(m), X, y, y_strata, k=10)
         cv_rmse_matrix[name] = rmses
         results[name] = {
             "rmse_mean": float(rmses.mean()),
             "rmse_std": float(rmses.std()),
             "r2_mean": float(r2s.mean()),
             "r2_std": float(r2s.std()),
+            "mae_mean": float(maes.mean()),
+            "mae_std": float(maes.std()),
         }
 
     blend_rmses = []
     blend_r2s = []
-    kf = KFold(n_splits=10, shuffle=True, random_state=RANDOM_STATE)
-    for train_idx, test_idx in kf.split(X):
+    blend_maes = []
+    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=RANDOM_STATE)
+    for train_idx, test_idx in skf.split(X, y_strata):
         X_tr, X_te = X.iloc[train_idx], X.iloc[test_idx]
         y_tr, y_te = y.iloc[train_idx], y.iloc[test_idx]
         X_tr_fit, X_tr_val, y_tr_fit, y_tr_val = train_test_split(
@@ -229,6 +241,7 @@ def run_pipeline(df: pd.DataFrame, output_dir: str) -> dict:
         pred = blend_fold.predict(X_te)
         blend_rmses.append(mean_squared_error(y_te, pred) ** 0.5)
         blend_r2s.append(r2_score(y_te, pred))
+        blend_maes.append(mean_absolute_error(y_te, pred))
     blend_rmses = np.array(blend_rmses)
     cv_rmse_matrix["Blending"] = blend_rmses
     results["Blending"] = {
@@ -236,6 +249,8 @@ def run_pipeline(df: pd.DataFrame, output_dir: str) -> dict:
         "rmse_std": float(blend_rmses.std()),
         "r2_mean": float(np.mean(blend_r2s)),
         "r2_std": float(np.std(blend_r2s)),
+        "mae_mean": float(np.mean(blend_maes)),
+        "mae_std": float(np.std(blend_maes)),
     }
 
     winner = min(results, key=lambda k: results[k]["rmse_mean"])
@@ -278,6 +293,49 @@ def run_pipeline(df: pd.DataFrame, output_dir: str) -> dict:
     X_test_design = add_constant(y_pred_test)
     bp_stat, bp_p, _, _ = het_breuschpagan(residuals, X_test_design)
 
+    print("Calculando interpretabilidad SHAP sobre el modelo ganador...")
+    winner_predict = blend.predict if winner == "Blending" else winner_model_full.predict
+
+    # SHAP necesita entradas numericas: codificamos las categoricas a enteros
+    # (segun las categorias vistas en los datos) y decodificamos dentro de la
+    # funcion de prediccion antes de llamar al pipeline real.
+    cat_categories = {col: sorted(X[col].astype(str).unique().tolist())
+                       for col in FEATURE_COLUMNS_CATEGORICAL}
+
+    def _encode(df_raw: pd.DataFrame) -> pd.DataFrame:
+        enc = df_raw.copy()
+        for col in FEATURE_COLUMNS_CATEGORICAL:
+            cats = cat_categories[col]
+            enc[col] = enc[col].astype(str).map({c: i for i, c in enumerate(cats)}).astype(float)
+        for col in FEATURE_COLUMNS_NUMERIC:
+            enc[col] = enc[col].astype(float)
+        return enc[X.columns]
+
+    def _decode(arr: np.ndarray) -> pd.DataFrame:
+        df = pd.DataFrame(arr, columns=X.columns)
+        for col in FEATURE_COLUMNS_CATEGORICAL:
+            cats = cat_categories[col]
+            idx = df[col].round().clip(0, len(cats) - 1).astype(int)
+            df[col] = idx.map(lambda i: cats[i])
+        for col in FEATURE_COLUMNS_NUMERIC:
+            df[col] = df[col].astype(float)
+        return df[X.columns]
+
+    def _predict_array(data):
+        return winner_predict(_decode(np.asarray(data)))
+
+    bg_sample = _encode(X_train.sample(n=min(40, len(X_train)), random_state=RANDOM_STATE))
+    eval_sample = _encode(X_test.sample(n=min(120, len(X_test)), random_state=RANDOM_STATE))
+
+    explainer = shap.Explainer(_predict_array, bg_sample, algorithm="permutation",
+                                seed=RANDOM_STATE)
+    shap_result = explainer(eval_sample, max_evals="auto")
+    mean_abs_shap = np.abs(shap_result.values).mean(axis=0)
+    shap_importance = dict(
+        sorted(zip(X.columns.tolist(), mean_abs_shap.tolist()), key=lambda kv: -kv[1])
+    )
+    print("SHAP listo:", shap_importance)
+
     summary = {
         "model_performance": results,
         "winner": winner,
@@ -288,6 +346,13 @@ def run_pipeline(df: pd.DataFrame, output_dir: str) -> dict:
         "shapiro_wilk_residuals": {"statistic": float(shapiro_stat), "p_value": float(shapiro_p)},
         "breusch_pagan_residuals": {"statistic": float(bp_stat), "p_value": float(bp_p)},
         "blending_weights": blend.weights_.tolist() if winner != "Blending" else blend.weights_.tolist(),
+        "shap_importance": shap_importance,
+        "y_test_sample": y_test.values[:300].tolist(),
+        "y_pred_sample": y_pred_test[:300].tolist(),
+        "cv_fold_rmse": {name: arr.tolist() for name, arr in cv_rmse_matrix.items()},
+        "strata_counts": {
+            int(k): int(v) for k, v in pd.Series(y_strata).value_counts().sort_index().items()
+        },
     }
 
     with open(f"{output_dir}/ml_results.json", "w") as f:
