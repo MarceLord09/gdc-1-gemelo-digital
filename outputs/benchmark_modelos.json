@@ -1,0 +1,413 @@
+{
+  "latency_rows": 1000,
+  "cv_folds": 10,
+  "rows": [
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 4
+      },
+      "rmse_mean": 4.908825981469643,
+      "rmse_std": 0.3620906804209363,
+      "latency_ms": 16.701540997019038,
+      "size_kb": 252.5380859375
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 8
+      },
+      "rmse_mean": 2.988471740470325,
+      "rmse_std": 0.37063252378328193,
+      "latency_ms": 17.562041990458965,
+      "size_kb": 3005.4453125
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 12
+      },
+      "rmse_mean": 2.7429032279766856,
+      "rmse_std": 0.3742760625065183,
+      "latency_ms": 18.55795900337398,
+      "size_kb": 13664.2578125
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 20
+      },
+      "rmse_mean": 2.7495608070441184,
+      "rmse_std": 0.3858831798422628,
+      "latency_ms": 31.12937498372048,
+      "size_kb": 22102.7421875
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 4
+      },
+      "rmse_mean": 4.908020829464578,
+      "rmse_std": 0.36355406733365364,
+      "latency_ms": 30.730999977095053,
+      "size_kb": 501.3037109375
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 8
+      },
+      "rmse_mean": 2.9717559115812304,
+      "rmse_std": 0.3663469711145498,
+      "latency_ms": 30.382583005120978,
+      "size_kb": 5996.703125
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 12
+      },
+      "rmse_mean": 2.729518640875802,
+      "rmse_std": 0.37665938094599044,
+      "latency_ms": 40.08829197846353,
+      "size_kb": 27338.09375
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 20
+      },
+      "rmse_mean": 2.7333297031383577,
+      "rmse_std": 0.3845190150765483,
+      "latency_ms": 29.521249991375953,
+      "size_kb": 44219.984375
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 300,
+        "max_depth": 4
+      },
+      "rmse_mean": 4.905536629387603,
+      "rmse_std": 0.3703857876069131,
+      "latency_ms": 29.82125000562519,
+      "size_kb": 750.0703125
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 300,
+        "max_depth": 8
+      },
+      "rmse_mean": 2.961964709706319,
+      "rmse_std": 0.3688218588951942,
+      "latency_ms": 43.11283299466595,
+      "size_kb": 8986.142578125
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 300,
+        "max_depth": 12
+      },
+      "rmse_mean": 2.7196318855131745,
+      "rmse_std": 0.38327840031208094,
+      "latency_ms": 41.867417021421716,
+      "size_kb": 40932.7587890625
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 300,
+        "max_depth": 20
+      },
+      "rmse_mean": 2.7183079118197266,
+      "rmse_std": 0.3839672994773988,
+      "latency_ms": 43.100166018120944,
+      "size_kb": 66349.0400390625
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 400,
+        "max_depth": 4
+      },
+      "rmse_mean": 4.903733247280454,
+      "rmse_std": 0.37224768635387057,
+      "latency_ms": 43.3083749958314,
+      "size_kb": 998.8359375
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 400,
+        "max_depth": 8
+      },
+      "rmse_mean": 2.963292869119534,
+      "rmse_std": 0.37498600909712343,
+      "latency_ms": 41.85541701735929,
+      "size_kb": 11985.4248046875
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 400,
+        "max_depth": 12
+      },
+      "rmse_mean": 2.717743362333985,
+      "rmse_std": 0.3892350674006206,
+      "latency_ms": 42.94462502002716,
+      "size_kb": 54575.0947265625
+    },
+    {
+      "model": "RandomForest",
+      "params": {
+        "n_estimators": 400,
+        "max_depth": 20
+      },
+      "rmse_mean": 2.716672075948527,
+      "rmse_std": 0.3895453175445063,
+      "latency_ms": 54.61962500703521,
+      "size_kb": 88430.4228515625
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 3
+      },
+      "rmse_mean": 2.5741085414266065,
+      "rmse_std": 0.22340166498826386,
+      "latency_ms": 3.4269170137122273,
+      "size_kb": 120.62890625
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 4
+      },
+      "rmse_mean": 2.164445427525246,
+      "rmse_std": 0.23403689990022492,
+      "latency_ms": 4.132583999307826,
+      "size_kb": 173.22265625
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 5
+      },
+      "rmse_mean": 2.140751989756621,
+      "rmse_std": 0.18155014590594254,
+      "latency_ms": 4.427292005857453,
+      "size_kb": 274.7578125
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 8
+      },
+      "rmse_mean": 2.580908711840785,
+      "rmse_std": 0.4188926216290303,
+      "latency_ms": 6.222208990948275,
+      "size_kb": 1130.8984375
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 3
+      },
+      "rmse_mean": 2.241520759846829,
+      "rmse_std": 0.23183193918530884,
+      "latency_ms": 4.518166009802371,
+      "size_kb": 234.8349609375
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 4
+      },
+      "rmse_mean": 2.0249698554731594,
+      "rmse_std": 0.21505631314532164,
+      "latency_ms": 4.820290982024744,
+      "size_kb": 339.4248046875
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 5
+      },
+      "rmse_mean": 2.0786578885702007,
+      "rmse_std": 0.17125465083863692,
+      "latency_ms": 6.139042001450434,
+      "size_kb": 533.6630859375
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 8
+      },
+      "rmse_mean": 2.5894696563867,
+      "rmse_std": 0.4205119435246727,
+      "latency_ms": 9.167458018055186,
+      "size_kb": 2145.1396484375
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 400,
+        "max_depth": 3
+      },
+      "rmse_mean": 2.1111490340832133,
+      "rmse_std": 0.2178918041493987,
+      "latency_ms": 6.063958018785343,
+      "size_kb": 463.3515625
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 400,
+        "max_depth": 4
+      },
+      "rmse_mean": 1.9887196947229164,
+      "rmse_std": 0.20156717674826524,
+      "latency_ms": 7.226707995869219,
+      "size_kb": 670.671875
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 400,
+        "max_depth": 5
+      },
+      "rmse_mean": 2.0860947810059853,
+      "rmse_std": 0.17051508563282208,
+      "latency_ms": 8.575040992582217,
+      "size_kb": 1046.33203125
+    },
+    {
+      "model": "XGBoost",
+      "params": {
+        "n_estimators": 400,
+        "max_depth": 8
+      },
+      "rmse_mean": 2.594210889964348,
+      "rmse_std": 0.4194233017165045,
+      "latency_ms": 15.613916009897366,
+      "size_kb": 4081.0234375
+    },
+    {
+      "model": "SVR",
+      "params": {
+        "C": 1,
+        "epsilon": 0.1
+      },
+      "rmse_mean": 4.635439677824395,
+      "rmse_std": 0.3590501439087211,
+      "latency_ms": 147.1587090054527,
+      "size_kb": 495.7822265625
+    },
+    {
+      "model": "SVR",
+      "params": {
+        "C": 1,
+        "epsilon": 0.5
+      },
+      "rmse_mean": 4.632194721094939,
+      "rmse_std": 0.362715246114505,
+      "latency_ms": 120.13787499745376,
+      "size_kb": 404.4814453125
+    },
+    {
+      "model": "SVR",
+      "params": {
+        "C": 1,
+        "epsilon": 1.0
+      },
+      "rmse_mean": 4.645960374366123,
+      "rmse_std": 0.36685274463882456,
+      "latency_ms": 96.64858301403001,
+      "size_kb": 322.0830078125
+    },
+    {
+      "model": "SVR",
+      "params": {
+        "C": 10,
+        "epsilon": 0.1
+      },
+      "rmse_mean": 2.4400190947637173,
+      "rmse_std": 0.30494220133491057,
+      "latency_ms": 142.56658300291747,
+      "size_kb": 482.1181640625
+    },
+    {
+      "model": "SVR",
+      "params": {
+        "C": 10,
+        "epsilon": 0.5
+      },
+      "rmse_mean": 2.4456316451415883,
+      "rmse_std": 0.300900435347311,
+      "latency_ms": 102.65129100298509,
+      "size_kb": 343.4072265625
+    },
+    {
+      "model": "SVR",
+      "params": {
+        "C": 10,
+        "epsilon": 1.0
+      },
+      "rmse_mean": 2.5019973696945903,
+      "rmse_std": 0.29532360618939507,
+      "latency_ms": 70.6912919995375,
+      "size_kb": 234.3017578125
+    },
+    {
+      "model": "SVR",
+      "params": {
+        "C": 100,
+        "epsilon": 0.1
+      },
+      "rmse_mean": 2.0943797939396274,
+      "rmse_std": 0.2544931019122613,
+      "latency_ms": 144.58220801316202,
+      "size_kb": 488.7451171875
+    },
+    {
+      "model": "SVR",
+      "params": {
+        "C": 100,
+        "epsilon": 0.5
+      },
+      "rmse_mean": 2.0837852760437383,
+      "rmse_std": 0.2589538071714349,
+      "latency_ms": 109.5121249963995,
+      "size_kb": 365.3544921875
+    },
+    {
+      "model": "SVR",
+      "params": {
+        "C": 100,
+        "epsilon": 1.0
+      },
+      "rmse_mean": 2.132679504079769,
+      "rmse_std": 0.26626198667696294,
+      "latency_ms": 75.9853329800535,
+      "size_kb": 254.1767578125
+    }
+  ]
+}

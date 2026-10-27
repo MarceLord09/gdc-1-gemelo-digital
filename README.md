@@ -67,3 +67,13 @@ Si `outputs/dataset_sintetico.csv` no existe todavía, corre primero:
 ```bash
 .venv/bin/streamlit run app.py
 ```
+
+## Licencia
+
+MIT (ver `LICENSE`).
+
+## Análisis adicionales (revisión por pares)
+
+- `src/sensibilidad.py`: incertidumbre entre 20 poblaciones, sensibilidad a parámetros y umbrales de pobreza de tiempo (`outputs/sensibilidad.json`; endpoint `/api/scenarios/sensitivity`).
+- `src/benchmark_modelos.py`: barrido de 37 configuraciones con error, latencia y tamaño (`outputs/benchmark_modelos.json`; endpoint `/api/ml/benchmark`).
+- `outputs/hiperparametros_seleccionados.json`: hiperparámetros elegidos por `RandomizedSearchCV`.

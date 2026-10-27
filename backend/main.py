@@ -23,6 +23,8 @@ sys.path.insert(0, str(ROOT_DIR / "src"))
 from motor_calculo import Individual, SCENARIOS, allocate_time  # noqa: E402
 from escenarios import compare_scenarios  # noqa: E402
 from pipeline_ml import run_pipeline  # noqa: E402
+from benchmark_modelos import run_benchmark  # noqa: E402
+from sensibilidad import run_sensitivity  # noqa: E402
 
 OUTPUT_DIR = ROOT_DIR / "outputs"
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -30,6 +32,8 @@ SCENARIOS_CACHE = OUTPUT_DIR / "comparacion_escenarios.csv"
 DATASET_PATH = OUTPUT_DIR / "dataset_sintetico.csv"
 ML_RESULTS_PATH = OUTPUT_DIR / "ml_results.json"
 ML_PERF_PATH = OUTPUT_DIR / "model_performance.csv"
+BENCHMARK_PATH = OUTPUT_DIR / "benchmark_modelos.json"
+SENSITIVITY_PATH = OUTPUT_DIR / "sensibilidad.json"
 
 SCENARIO_INFO = {
     "Base": {
@@ -190,6 +194,38 @@ def ml_retrain():
     df = pd.read_csv(DATASET_PATH)
     summary = run_pipeline(df, str(OUTPUT_DIR))
     return summary
+
+
+@app.get("/api/scenarios/sensitivity")
+def scenarios_sensitivity():
+    if not SENSITIVITY_PATH.exists():
+        return None
+    import json
+
+    with open(SENSITIVITY_PATH) as f:
+        return json.load(f)
+
+
+@app.post("/api/scenarios/sensitivity")
+def scenarios_sensitivity_run():
+    return run_sensitivity(str(SENSITIVITY_PATH))
+
+
+@app.get("/api/ml/benchmark")
+def ml_benchmark():
+    if not BENCHMARK_PATH.exists():
+        return None
+    import json
+
+    with open(BENCHMARK_PATH) as f:
+        return json.load(f)
+
+
+@app.post("/api/ml/benchmark")
+def ml_benchmark_run():
+    if not DATASET_PATH.exists():
+        raise HTTPException(status_code=409, detail="No existe el dataset sintetico todavia.")
+    return run_benchmark(pd.read_csv(DATASET_PATH), str(BENCHMARK_PATH))
 
 
 @app.get("/api/health")

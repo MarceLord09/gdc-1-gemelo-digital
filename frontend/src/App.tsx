@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./components/Layout.css";
+import { ReportButton } from "./components/ReportButton";
 import { EscenariosView } from "./views/EscenariosView";
 import { IndividuoView } from "./views/IndividuoView";
 import { MLView } from "./views/MLView";
@@ -46,6 +47,9 @@ export default function App() {
       </header>
 
       <main className="content">
+        <div className="report-bar">
+          <ReportButton title={`GDC-1 — ${TABS.find((t) => t.key === tab)?.label}`} />
+        </div>
         {tab === "escenarios" && <EscenariosView />}
         {tab === "individuo" && <IndividuoView />}
         {tab === "ml" && <MLView />}
