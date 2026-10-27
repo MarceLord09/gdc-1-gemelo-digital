@@ -1,4 +1,6 @@
 import type {
+  Benchmark,
+  Sensitivity,
   IndividualOutcome,
   IndividualRequest,
   MlPerformanceResponse,
@@ -65,4 +67,20 @@ export function postMlRetrain() {
   return request<MlPerformanceResponse["results"]>("/api/ml/retrain", {
     method: "POST",
   });
+}
+
+export function getMlBenchmark() {
+  return request<Benchmark | null>("/api/ml/benchmark");
+}
+
+export function postMlBenchmark() {
+  return request<Benchmark>("/api/ml/benchmark", { method: "POST" });
+}
+
+export function getSensitivity() {
+  return request<Sensitivity | null>("/api/scenarios/sensitivity");
+}
+
+export function postSensitivity() {
+  return request<Sensitivity>("/api/scenarios/sensitivity", { method: "POST" });
 }

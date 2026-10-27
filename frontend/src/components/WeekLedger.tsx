@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { ChartPayload } from "../lib/exporter";
 import "./WeekLedger.css";
 
 export interface WeekSegment {
@@ -55,4 +56,30 @@ export function WeekLedger({ segments, totalHours = 168 }: WeekLedgerProps) {
       </div>
     </div>
   );
+}
+
+/** Versión vectorial de la barra de la semana, para exportar. */
+export function weekLedgerChart(segments: WeekSegment[], totalHours = 168): ChartPayload {
+  const W = 600;
+  const BAR_H = 44;
+  const total = segments.reduce((a, s) => a + Math.max(s.hours, 0), 0) || totalHours;
+  const gap = 2;
+  const usable = W - gap * (segments.length - 1);
+  let x = 0;
+  let markup = "";
+  segments.forEach((s) => {
+    const w = (Math.max(s.hours, 0) / total) * usable;
+    markup += `<rect x="${x}" y="0" width="${w}" height="${BAR_H}" fill="${getComputedStyle(document.documentElement).getPropertyValue(s.colorVar.slice(4, -1)).trim()}"/>`;
+    if (w > 46) {
+      markup += `<text x="${x + w / 2}" y="${BAR_H / 2 + 4}" text-anchor="middle" font-size="12" font-weight="600" fill="#ffffff" font-family="sans-serif">${s.hours.toFixed(1)} h</text>`;
+    }
+    x += w + gap;
+  });
+  markup += `<text x="0" y="${BAR_H + 18}" font-size="11" fill="#6b7280" font-family="sans-serif">0 h</text>`;
+  markup += `<text x="${W}" y="${BAR_H + 18}" text-anchor="end" font-size="11" fill="#6b7280" font-family="sans-serif">${totalHours} h</text>`;
+  const legend = segments.map((s) => ({
+    label: `${s.label}: ${s.hours.toFixed(1)} h`,
+    color: getComputedStyle(document.documentElement).getPropertyValue(s.colorVar.slice(4, -1)).trim(),
+  }));
+  return { markup, width: W, height: BAR_H + 26, legend };
 }

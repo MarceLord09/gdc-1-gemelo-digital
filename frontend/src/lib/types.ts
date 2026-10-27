@@ -87,9 +87,64 @@ export interface MlResults {
   shapiro_wilk_residuals: { statistic: number; p_value: number };
   breusch_pagan_residuals: { statistic: number; p_value: number };
   blending_weights: number[];
+  cv_fold_rmse?: Record<string, number[]>;
 }
 
 export interface MlPerformanceResponse {
   performance: ModelPerformance | null;
   results: MlResults | null;
+}
+
+export interface BenchmarkRow {
+  model: string;
+  params: Record<string, number>;
+  rmse_mean: number;
+  rmse_std: number;
+  latency_ms: number;
+  size_kb: number;
+}
+
+export interface Benchmark {
+  latency_rows: number;
+  cv_folds: number;
+  rows: BenchmarkRow[];
+}
+
+export interface SensitivitySeedRow {
+  scenario: ScenarioKey;
+  gap_values: number[];
+  gap_mean: number;
+  gap_sd: number;
+  delta_mean: number;
+  delta_sd: number;
+  delta_ci_low: number;
+  delta_ci_high: number;
+  participation_mean: number;
+  participation_sd: number;
+}
+
+export interface SensitivityModifier {
+  scenario: ScenarioKey;
+  key: string;
+  label: string;
+  base_value: number;
+  points: { factor: number; value: number; gap: number; participation: number }[];
+}
+
+export interface SensitivityBaseParam {
+  key: string;
+  label: string;
+  points: { factor: number; gap_base: number; gap_F: number; participation_base: number; participation_F: number }[];
+}
+
+export interface Sensitivity {
+  n: number;
+  seeds: number[];
+  ref_seed: number;
+  factors: number[];
+  leisure_thresholds: number[];
+  seeds_rows: SensitivitySeedRow[];
+  modifiers: SensitivityModifier[];
+  base_params: SensitivityBaseParam[];
+  poverty: { scenario: ScenarioKey; rates: Record<string, number> }[];
 }

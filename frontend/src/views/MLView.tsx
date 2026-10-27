@@ -3,10 +3,12 @@ import { BarChart } from "../components/BarChart";
 import { ChartBlock } from "../components/ChartBlock";
 import { LedgerTable } from "../components/LedgerTable";
 import { Section } from "../components/Section";
+import { EficienciaSection } from "./EficienciaSection";
 import { SpinnerLine } from "../components/SpinnerLine";
 import { StatGrid, StatTile } from "../components/StatTile";
 import * as api from "../lib/api";
-import type { MlPerformanceResponse, ModelPerformanceRow } from "../lib/types";
+import { fmtNum } from "../lib/format";
+import type { MlPerformanceResponse, MlResults, ModelPerformanceRow } from "../lib/types";
 
 function pValueLabel(p: number): string {
   if (Number.isNaN(p)) return "—";
@@ -42,6 +44,7 @@ export function MLView() {
   }
 
   const winner = data?.results?.winner ?? null;
+  const mlTexts = mlInterpretation(data, winner);
 
   return (
     <>
@@ -62,6 +65,9 @@ export function MLView() {
         {data?.performance && (
           <>
             <LedgerTable<ModelPerformanceRow>
+              title="Desempeño de los modelos (validación cruzada 10-fold)"
+              interpretation={mlTexts.table}
+              explanation="RMSE es el error típico de la predicción, en horas de cuidado por semana (menor es mejor). R² es la proporción de la variación en las horas de cuidado que el modelo explica (1 es perfecto). El valor tras ± es la desviación entre los 10 pliegues: cuanto menor, más estable es el modelo ante distintas muestras. Todos los modelos usan las mismas variables, con las numéricas estandarizadas y las categóricas codificadas, y la fila resaltada es el ganador."
               rowKey={(r) => r.model}
               rows={data.performance.rows}
               isHighlighted={(r) => r.model === winner}
@@ -81,13 +87,16 @@ export function MLView() {
             />
 
             <ChartBlock
+              interpretation={mlTexts.chart}
+              explanation="Cada barra es el RMSE promedio de un modelo en los 10 pliegues de validación cruzada, es decir, predicciones sobre datos que el modelo no vio al entrenar. Una diferencia pequeña entre barras puede no ser real: la sección de validación estadística indica cuáles diferencias son significativas."
               title="RMSE promedio por modelo"
               caption="Validación cruzada 10-fold. Menor es mejor; el modelo ganador se resalta."
             >
               <BarChart
                 ariaLabel="RMSE promedio por modelo"
                 series={[{ key: "rmse", label: "RMSE", colorVar: "var(--series-neutral)" }]}
-                valueFormat={(v) => v.toFixed(2)}
+                yLabel="RMSE (h/semana)"
+                valueFormat={(v) => fmtNum(v, 2)}
                 data={data.performance.rows.map((r) => ({
                   key: r.model,
                   label: r.model,
@@ -116,7 +125,11 @@ export function MLView() {
           title="Validación estadística"
           caption="La comparación formal entre modelos, documentada en el artículo, Secciones 2-4."
         >
-          <StatGrid>
+          <StatGrid
+            title="Pruebas estadísticas de la validación"
+            interpretation={statsTexts(data.results).interpretation}
+            explanation="Friedman compara los cinco modelos a la vez sobre los mismos pliegues y dice si al menos uno difiere de los demás. El intervalo bootstrap 95% acota el error esperado del ganador remuestreando sus predicciones. Shapiro-Wilk contrasta si los residuos son normales y Breusch-Pagan si su varianza es constante (homocedasticidad); ambos validan los supuestos del análisis, no la precisión del modelo. Un p-valor menor a 0.05 se considera evidencia contra la hipótesis nula de cada prueba."
+          >
             <StatTile label="Modelo ganador" value={data.results.winner} />
             <StatTile
               label="Prueba de Friedman entre los 5 modelos"
@@ -141,10 +154,10 @@ export function MLView() {
           </StatGrid>
 
           <div style={{ marginTop: 22 }}>
-            <div className="chart-block-title" style={{ marginBottom: 10 }}>
-              Wilcoxon post-hoc frente al ganador
-            </div>
             <LedgerTable
+              title="Wilcoxon post-hoc frente al ganador"
+              interpretation={wilcoxonInterpretation(data.results)}
+              explanation="Prueba de rangos con signo de Wilcoxon sobre los errores por pliegue de cada modelo frente al ganador. La hipótesis nula es que ambos tienen el mismo error; un p-valor menor a 0.05 indica que el ganador es significativamente distinto (mejor) que ese modelo. Con solo 10 pliegues la prueba tiene poca potencia, así que un p-valor alto no prueba que los modelos sean equivalentes."
               rowKey={(r) => r.model}
               rows={Object.entries(data.results.wilcoxon_vs_winner).map(([model, v]) => ({
                 model,
@@ -159,6 +172,33 @@ export function MLView() {
           </div>
         </Section>
       )}
+      {data?.results && <EficienciaSection cv={data.results.cv_fold_rmse} />}
     </>
   );
+}
+
+function mlInterpretation(data: MlPerformanceResponse | null, winner: string | null) {
+  const rows = data?.performance?.rows ?? [];
+  const w = rows.find((r) => r.model === winner) ?? rows.reduce((b, r) => (r.rmse_mean < b.rmse_mean ? r : b), rows[0]);
+  const worst = rows.reduce((b, r) => (r.rmse_mean > b.rmse_mean ? r : b), rows[0]);
+  if (!w || !worst) return { table: "", chart: "" };
+  const table = `${w.model} es el modelo con mejor desempeño: se equivoca en promedio ${w.rmse_mean.toFixed(2)} h/semana y explica ${(w.r2_mean * 100).toFixed(1)}% de la variación del cuidado no remunerado. El más débil, ${worst.model}, se equivoca ${worst.rmse_mean.toFixed(2)} h.`;
+  const chart = `${w.model} tiene el menor error (${w.rmse_mean.toFixed(2)} h/semana), ${(worst.rmse_mean - w.rmse_mean).toFixed(2)} h menos que ${worst.model}. Las barras de error ± (${w.rmse_std.toFixed(2)} h en el ganador) muestran cuánto varía ese error entre pliegues.`;
+  return { table, chart };
+}
+
+function statsTexts(r: MlResults) {
+  const f = r.friedman.p_value < 0.05;
+  const sw = r.shapiro_wilk_residuals.p_value < 0.05;
+  const bp = r.breusch_pagan_residuals.p_value < 0.05;
+  return {
+    interpretation: `${f ? "Hay diferencias significativas entre los cinco modelos" : "No hay evidencia de diferencias entre los cinco modelos"} (Friedman, p ${pValueLabel(r.friedman.p_value)}). El error esperado de ${r.winner} está entre ${r.bootstrap_ci_rmse_winner.lower.toFixed(2)} y ${r.bootstrap_ci_rmse_winner.upper.toFixed(2)} h/semana con 95% de confianza. Los residuos ${sw ? "no son normales" : "son compatibles con una distribución normal"} (Shapiro-Wilk) y ${bp ? "su varianza no es constante" : "su varianza es aproximadamente constante"} (Breusch-Pagan).`,
+  };
+}
+
+function wilcoxonInterpretation(r: MlResults) {
+  const entries = Object.entries(r.wilcoxon_vs_winner);
+  const sig = entries.filter(([, v]) => v.p_value < 0.05).map(([m]) => m);
+  const ns = entries.filter(([, v]) => !(v.p_value < 0.05)).map(([m]) => m);
+  return `${r.winner} es significativamente distinto de ${sig.length ? sig.join(", ") : "ningún modelo"}${ns.length ? `; frente a ${ns.join(", ")} no hay evidencia suficiente para distinguirlo` : ""}.`;
 }
